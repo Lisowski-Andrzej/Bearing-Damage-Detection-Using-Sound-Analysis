@@ -1,0 +1,103 @@
+%% Analiza widma lozysk
+
+clear;
+clc;
+close all;
+
+%% wgranie sygnalu 
+
+% nagranie 2 40% na srubie 800RPM
+% nagranie 1 16% na srubie  320RPM
+% [signal,Fs] = audioread("Nagrywanie_1.m4a"); % A/Ad Az Az1 Az2 ...
+[signal,Fs] = audioread("Nagrywanie2.m4a"); % A/Ad Az Az1 Az2 ...
+
+
+samples = length(signal);
+y = samples/Fs;
+
+t = linspace(0, y, samples);
+figure(1)
+plot(t,signal,'b')
+ylabel('Amplitude')
+xlabel('Time (secs)');
+title("Signal in time domain")
+
+
+%% transormata
+dt = 1/Fs;                                                              % krok czasu 
+T = 100;
+t = 0:dt:T-dt;                                                          % wektor czasu 
+x =signal;                                                              % signal
+S = fft(x);                                                             % calculate fft for signal s
+N = length(x);                                                          % number of samples
+df = Fs/N;                                                              % frequency step
+f_vec = (0:(N-1))*df;                                                   % frequency vector
+S_amp = abs(S);                                                         % amplitude
+S_amp_norm = abs(S)/N; S_amp_norm(1)=S_amp_norm(1)/2;
+
+%% Wzory na uszkodzone czestotliwosc
+
+% % % lozysko 6203
+z = 11; % liczba elementow tocznych w rzedzie
+D0 = 6.5; % srednica elementow tocznych
+dm = 28.5; % srednica podzialkowa
+alfa = 90; % kat dzialania lozyska
+
+
+% lozysko 6004
+% z = 11; % liczba elementow tocznych w rzedzie
+% D0 = 6.5; % srednica elementow tocznych
+% dm = 31; % srednica podzialkowa
+% alfa = 90; % kat dzialania lozyska
+
+% % % lozysko 61904
+% z = 11; % liczba elementow tocznych w rzedzie
+% D0 = 4.5; % srednica elementow tocznych
+% dm = 28.5; % srednica podzialkowa
+% alfa = 90; % kat dzialania lozyska
+
+% nagranie 2
+n = 805; % RPM lozyska
+n2 = 795; % RPM lozyska
+
+% nagranie 1
+% n = 600; % RPM lozyska
+% n2 = 585; % RPM lozyska
+
+% uszkodzony pierscien zewnetrzny
+f1 = (z/2) * (n/60) * (1 - (D0/dm) * cos(alfa) );
+
+% uszkodzony pierscien wewnetrzny
+f2 = (z/2) * (n/60) * (1 + (D0/dm) * cos(alfa) );
+
+% uszkodzony element toczny
+f3 = 2 * (D0/dm) * (n/60) * (1 - ((D0/dm) * cos(alfa))^2 );
+
+% uszkodzony pierscien zewnetrzny
+f4 = (z/2) * (n2/60) * (1 - (D0/dm) * cos(alfa) );
+
+% uszkodzony pierscien wewnetrzny
+f5 = (z/2) * (n2/60) * (1 + (D0/dm) * cos(alfa) );
+
+% uszkodzony element toczny
+f6 = 2 * (D0/dm) * (n2/60) * (1 - ((D0/dm) * cos(alfa))^2 );
+
+
+%% wykreslanie 
+
+figure(2) 
+plot(f_vec, S_amp_norm, 'b')                                                 % plot amplitude spectrum
+xlabel('Frequency [Hz]')
+ylabel('Amplitude [a.u.]')
+title('Amplitude in frequency domain')
+hold on;
+xline(f1, '--r', 'LineWidth', 0.5);  % rysowanie przerywanej czerwonej pionowej kreski na wykresie
+xline(f2, '--k', 'LineWidth', 0.5);  % rysowanie przerywanej pomarańczowej pionowej kreski na wykresie
+xline(f3, '--y', 'LineWidth', 0.5);  % rysowanie przerywanej żółtej pionowej kreski na wykresie
+xline(f4, '--r', 'LineWidth', 0.5);  % rysowanie przerywanej czerwonej pionowej kreski na wykresie
+xline(f5, '--k', 'LineWidth', 0.5);  % rysowanie przerywanej pomarańczowej pionowej kreski na wykresie
+xline(f6, '--y', 'LineWidth', 0.5);  % rysowanie przerywanej żółtej pionowej kreski na wykresie
+xlim([0,100]);
+legend('FFT Amplitude', 'Frequency f1', 'Frequency f2', 'Frequency f3', 'Frequency f4', 'Frequency f5', 'Frequency f6');
+grid on
+hold off;
