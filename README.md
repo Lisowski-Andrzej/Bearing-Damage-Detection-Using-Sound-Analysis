@@ -9,4 +9,8 @@ This project features a MATLAB program designed to analyze whether a bearing is 
 - User-friendly interface for importing and analyzing audio samples.
 
 ## Example Output
-Below is an example of the output produced by the bearing damage detection program:
+![image](https://github.com/user-attachments/assets/2d9dc890-b856-49c7-a492-0bd3f5ac4788)
+![image](https://github.com/user-attachments/assets/716cdea0-d148-442f-9762-8c9b1e2aa895)
+
+
+
